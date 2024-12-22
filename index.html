@@ -167,10 +167,9 @@
 					<div class="row text-center">
 						<div class="col-md-12">
 							<h3 class="text-center">Get in Touch</h3>
-							<form action="https://api.web3forms.com/submit" method="POST">
+							<form action="/.netlify/functions/contact-form" method="POST">
 								<div class="row text-center">
 									<div class="col-md-6">
-										<input type="hidden" name="access_key" value="ACCESS_KEY_FROM_WEB3FORM" />
 										<input type="text" name="name" class="content-input" placeholder="Enter your name" required />
 										<input type="email" name="email" class="content-input" placeholder="Enter your email" required />
 									</div>
@@ -213,5 +212,37 @@
 		<a class="btn-scroll" href="#">
 			<i class="fa fa-arrow-up" aria-hidden="true"></i>
 		</a>
+
+		<script>
+			const form = document.querySelector('form');
+			const responseDiv = document.getElementById('form-response');
+
+			form.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const formData = new FormData(form);
+
+				try {
+					const response = await fetch(form.action, {
+						method: 'POST',
+						body: JSON.stringify(Object.fromEntries(formData)),
+						headers: { 'Content-Type': 'application/json' },
+					});
+
+					const result = await response.json();
+					if (response.ok) {
+						responseDiv.style.display = 'block';
+						responseDiv.style.color = 'green';
+						responseDiv.textContent = 'Message sent successfully!';
+						form.reset();
+					} else {
+						throw new Error(result.message || 'Something went wrong.');
+					}
+				} catch (error) {
+					responseDiv.style.display = 'block';
+					responseDiv.style.color = 'red';
+					responseDiv.textContent = error.message;
+				}
+			});
+		</script>
 	</body>
 </html>
